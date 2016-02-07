@@ -11,8 +11,8 @@ def valid_url?(url)
 	Curl.get(url).status == "200 OK"
 end
 
-def links_for_user(username)
-	base_url = "http://www.fotolog.com/#{username}/mosaic/"
+def get_posts_ids
+	base_url = "http://www.fotolog.com/#{$username}/mosaic/"
 	links = []
 	page = 0
 	loop do
@@ -25,14 +25,14 @@ def links_for_user(username)
 	links
 end
 
-def download_post(username, post_id)
+def download_post(post_id)
 	post_dir = "#{$resources_dir}/#{post_id}"
-	post_url = "www.fotolog.com/#{username}/#{post_id}/"
-	target_file = "#{post_dir}/www.fotolog.com/#{username}/#{post_id}/index.html"
+	post_url = "www.fotolog.com/#{$username}/#{post_id}/"
+	target_file = "#{post_dir}/www.fotolog.com/#{$username}/#{post_id}/index.html"
 
 	create_dir(post_dir)
 	
-	p "Downloading #{username}/#{post_id}"
+	p "Downloading #{$username}/#{post_id}"
 	
 	commands = [
 		"cd #{post_dir}",
@@ -60,13 +60,32 @@ def path_for_post(post_id)
 	"#{$resources_dir}/#{post_id}/www.fotolog.com/#{$username}/#{post_id}/index.html"
 end
 
-$username = ARGV[0]
+def download_posts
+	posts_ids = get_posts_ids
+	threads = []
+	threads_amount = calculate_threads_amount(posts_ids)
+	
+	posts_ids.each_slice(threads_amount) do |posts|
+		posts.each do |post|
+			threads << Thread.new do
+				download_post(post)
+				create_post_link(post)
+				p "end"
+			end
+		end
+	end
+
+	threads.each {|t| t.join}
+end
+
+def calculate_threads_amount(posts_ids)
+	posts_ids.size > 20 ? 20 : posts_ids.size
+end
+
+$username = ARGV[0] 
 $main_dir = "#{Time.now.to_i}-#{$username}"
 $resources_dir = "#{$main_dir}/resources"
 $posts_dir = "#{$main_dir}/posts"
 
 create_dir($main_dir, $resources_dir, $posts_dir)
-links_for_user($username)
-	.each {|l| download_post($username, l)}
-	.each {|l| create_post_link(l)}
-
+download_posts
