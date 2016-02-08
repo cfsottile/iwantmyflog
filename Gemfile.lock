@@ -1,19 +1,17 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    byebug (8.2.1)
-    curb (0.9.1)
     mini_portile2 (2.0.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.6.7.2-java)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES
-  byebug
-  curb
   nokogiri
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

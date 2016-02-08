@@ -1,14 +1,14 @@
 Bundler.require
 
 def links_at_url(url)
-	doc = Nokogiri::HTML(Curl.get(url).body_str)
+	doc = Nokogiri::HTML(`curl -s #{url}`)
 	doc.css("#list_photos_mosaic").children.map do |square|
 		square.children.first["href"].split("/").last
 	end
 end
 
 def valid_url?(url)
-	Curl.get(url).status == "200 OK"
+	`curl -s -o /dev/null -w "%{http_code}" #{url}` == "200"
 end
 
 def get_posts_ids
@@ -66,11 +66,10 @@ def download_posts
 	threads_amount = calculate_threads_amount(posts_ids)
 	
 	posts_ids.each_slice(threads_amount) do |posts|
-		posts.each do |post|
-			threads << Thread.new do
+		threads << Thread.new do
+			posts.each do |post|
 				download_post(post)
 				create_post_link(post)
-				p "end"
 			end
 		end
 	end
@@ -79,7 +78,8 @@ def download_posts
 end
 
 def calculate_threads_amount(posts_ids)
-	posts_ids.size > 20 ? 20 : posts_ids.size
+	max_threads = 50
+	posts_ids.size > max_threads ? posts_ids.size / max_threads : 1
 end
 
 $username = ARGV[0] 
