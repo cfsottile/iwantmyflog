@@ -12,9 +12,8 @@
 * curl
 * wget
 * ruby 2.2.3+ ([installation guide](https://gorails.com/setup/) - just follow the steps up to the *Installing Ruby* section)
-* bundler gem (`$ gem install bundler
-`)
-* nokogiri gem ([installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html)
+* bundler gem (`$ gem install bundler`)
+* nokogiri gem ([installation guide](http://www.nokogiri.org/tutorials/installing_nokogiri.html))
 
 ## Installation
 
@@ -26,7 +25,7 @@ bundle install
 
 ## Usage
 
-```
+```console
 bundle exec ruby iwantmyflog.rb your_fotolog_username
 ```
 
